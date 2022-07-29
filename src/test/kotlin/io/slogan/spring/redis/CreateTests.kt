@@ -8,8 +8,6 @@ import io.slogan.spring.redis.repository.MetricRedisRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.test.context.SpringBootTest
-import java.time.Instant
-import java.util.UUID
 
 @SpringBootTest(
     classes = [SpringDataRedisApplication::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
@@ -23,7 +21,7 @@ internal class CreateTests(
 
     init {
         this.describe("Create Metric Data and Save to Redis") {
-            val metric = Metric(UUID.randomUUID().toString(), Instant.now(), 200.toULong(), 100.toULong())
+            val metric = Metric(first = 200L, second = 100L)
             metricRedisRepository.save(metric) shouldBe metric
         }
     }
