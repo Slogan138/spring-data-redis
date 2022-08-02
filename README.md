@@ -1,6 +1,7 @@
 # Spring Data Redis 사용하여 Redis Cache 사용하기
 
 ## Redis 란?
+
 ***Re***mote ***Di***ctionary ***S***erver 의 줄임말로 `Dictionary`, 즉 Key-Value 쌍 구조의 데이터 저장소이다.   
 In-Memory 에 데이터가 저장되어 R/W 속도가 매우 빠른것이 특징이다. 주로 Caching, Session 관리 Pub/Sub 기능을 위해 사용한다.
 
@@ -46,9 +47,30 @@ data class Metric(
 )
 ```
 
+data class 에 `@RedisHash` 어노테이션을 선언하여 Redis 에 저장되는 Entity 임을 알려준다. ID 로 사용할 Property 에는 `@Id` 어노테이션을 선언하여 정의한다.   
+이 떄 `@Id` 어노테이션은 `org.springframework.data.annotation.Id` 를 선언해야 한다. JPA 와 같이 사용한다면 `javax.persistence.Id` 와 혼동될 수 있으니
+유의한다.    
+`@RedisHash` 에 선언된 value 값과 `@Id` 가 선언된 Property 의 값이 key 가 되어 Redis 에 저장되게 된다.
+
+```
+127.0.0.1:6379> keys *
+1) "metric:302ecc8f-eaf9-4b28-a48e-ac9880559286"
+2) "metric"
+```
+
 #### Warning!!
 
-Primary Constructor 에 Default 값 없이 `val id: String` 과 같이 선언한다면 `kotlin.jvm.DefaultConstructorMarker` Property 가 주입되어 `MappingException` 이 발생한다.
+Primary Constructor 에 Default 값 없이 `val id: String` 과 같이 선언한다면 `kotlin.jvm.DefaultConstructorMarker` Property 가
+주입되어 `MappingException` 이 발생한다.
+
+### Repository 선언
+
+```kotlin
+interface MetricRedisRepository : CrudRepository<Metric, String>
+```
+
+`CrudRepository` interface 를 상속받아 `save()`, `findById()`, `delete()` 와 같은 기본적인 기능을 사용할 수 있다.   
+추가로 기능을 확장하고 싶으면 여타 다른 Spring Data 프로젝트와 유사하게 interface 에 method 선언만으로 가능하다.
 
 ### Reference.
 
