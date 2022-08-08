@@ -70,7 +70,23 @@ interface MetricRedisRepository : CrudRepository<Metric, String>
 ```
 
 `CrudRepository` interface 를 상속받아 `save()`, `findById()`, `delete()` 와 같은 기본적인 기능을 사용할 수 있다.   
-추가로 기능을 확장하고 싶으면 여타 다른 Spring Data 프로젝트와 유사하게 interface 에 method 선언만으로 가능하다.
+추가로 기능을 확장하고 싶으면 여타 다른 Spring Data 프로젝트와 유사하게 interface 에 method 선언만으로 가능하다.  
+어노테이션 추가 없이 `CrudRepository` 를 상속받게 된다면 자동으로 Spring Bean 으로 등록되게 된다.
+
+### Dependency Injection
+
+```kotlin
+@RestController
+class MetricController(private val metricRedisRepository: MetricRedisRepository) {
+
+    @GetMapping("/metric/{id}")
+    fun get(@PathVariable id: String) = metricRedisRepository.findById(id)
+}
+```
+
+Primary Constructor 에 생성한 Repository 를 명시함으로써 DI 를 받게 된다.  
+다만 Spring Data Redis 에서 Repository 를 사용하는 방식은 Blocking I/O 이기 때문에 WebFlux 를 이용한 Reactive Stack 에서 개발하게 된다면 IDE 에서 경고를 보낸다.  
+Non-Blocking I/O 를 지원하는 방식으로 개발해야 WebFlux 의 성격에 맞는 애플리케이션이 될 것이다.
 
 ### Reference.
 
